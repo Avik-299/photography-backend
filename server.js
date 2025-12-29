@@ -8,6 +8,10 @@ import { fileURLToPath } from "url";
 import authRoutes from "./routes/authRoutes.js";
 import albumRoutes from "./routes/albumRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
+import seedAdminRoutes from "./routes/seedAdmin.js";
+
+
+
 
 dotenv.config();
 const app = express();
@@ -32,6 +36,7 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/albums", albumRoutes);
+app.use("/api/seed", seedAdminRoutes);
 
 // Uploads
 const __filename = fileURLToPath(import.meta.url);

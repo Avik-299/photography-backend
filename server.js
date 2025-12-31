@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 import cors from "cors";
 import path from "path";
+import fs from "fs";
 import { fileURLToPath } from "url";
 
 import authRoutes from "./routes/authRoutes.js";
@@ -10,16 +11,13 @@ import albumRoutes from "./routes/albumRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import seedAdminRoutes from "./routes/seedAdmin.js";
 
-
-
-
 dotenv.config();
 const app = express();
 
 // DB
 connectDB();
 
-// CORS (IMPORTANT)
+// CORS
 app.use(
   cors({
     origin: [
@@ -32,19 +30,26 @@ app.use(
 
 app.use(express.json());
 
+// 🔥 PATH FIX
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// 🔥 ENSURE uploads directory exists
+const uploadsDir = path.join(__dirname, "uploads");
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
+// 🔥 SERVE uploads statically
+app.use("/uploads", express.static(uploadsDir));
+
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/albums", albumRoutes);
 app.use("/api/seed", seedAdminRoutes);
 
-// Uploads
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-
-// Test route
+// Test
 app.get("/api/test", (req, res) => {
   res.json({ status: "Backend running 🚀" });
 });
